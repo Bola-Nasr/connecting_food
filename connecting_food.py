@@ -8,11 +8,14 @@ import pycountry
 
 def download_file(url, filename):
     """
+    download csv from url
     """
     urllib.request.urlretrieve(url, filename)
 
+
 def is_valid(row, headers):
     """
+    check the validation of row
     """
     if len(row) != len(headers):
         return False  # Skip rows with incorrect number of columns
@@ -22,15 +25,17 @@ def is_valid(row, headers):
         if not pycountry.countries.get(alpha_2=row[8].strip()):
             return False  # ISO code is invalid
     except (ValueError, IndexError):
-        return False # Skip rows with invalid product_id or destination_country_code
+        return False  # Skip rows with invalid product_id or country_code
 
     if product_id != 10001:
         return False  # Skip rows with product_id other than 10001
 
     return True
 
+
 def split_file(input_file, output_directory, max_lines):
     """
+    get valid row and add it in sperate files regards to countryCode and date
     """
     with open(input_file, "r", newline="") as file:
         reader = csv.reader(file, delimiter=",")
@@ -39,9 +44,9 @@ def split_file(input_file, output_directory, max_lines):
         data = {}
 
         for row in reader:
-            if not is_valid(row,headers):
+            if not is_valid(row, headers):
                 continue
-            
+
             destination_country_code = row[8].strip()
             data_date = row[7].split(" ")[0]
             if data_date not in data:
@@ -82,7 +87,9 @@ if __name__ == "__main__":
         url = f"{URL}{SMALL}.csv"
         max_lines = DATA[SMALL]
     else:
-        raise ValueError("Wrong argument. Should be one of: large, medium, small")
+        raise ValueError(
+            "Wrong argument. Should be one of: large, medium, small"
+        )
 
     input_file = url.split("/")[-1]
     output_directory = f'{input_file.split(".")[0]}_output'
